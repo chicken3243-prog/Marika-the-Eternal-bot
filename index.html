@@ -6,209 +6,132 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     
     <style>
-        :root {
-            --gold: #d4af37;
-            --pale-gold: #f3e5ab;
-            --stone: #0a0904;
-            --deep-stone: #050503;
-        }
+        :root { --gold: #d4af37; --stone: #0a0904; --sidebar-width: 320px; }
+        body { background: var(--stone); color: #f3e5ab; font-family: 'Lora', serif; margin: 0; height: 100vh; display: flex; overflow: hidden; }
 
-        body { 
-            background: var(--stone); 
-            color: var(--gold); 
-            font-family: 'Lora', serif; 
-            font-size: 19px; 
-            margin: 0; 
-            display: flex; 
-            height: 100vh; 
-            overflow: hidden;
-        }
-
-        /* Sidebar for the Goddess */
+        /* Sidebar */
         .sidebar {
-            width: 350px;
-            background: #000;
-            border-right: 2px solid var(--gold);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            box-shadow: 10px 0 30px rgba(0,0,0,0.5);
-            z-index: 10;
+            width: var(--sidebar-width); height: 100vh; background: #000; border-right: 2px solid var(--gold);
+            position: fixed; left: 0; top: 0; display: flex; flex-direction: column; align-items: center; padding: 20px; box-sizing: border-box; z-index: 100;
         }
+        .sidebar img { width: 100%; border: 1px solid var(--gold); border-radius: 4px; margin-bottom: 20px; }
+        .sidebar h1 { font-family: 'Cinzel Decorative', serif; font-size: 1.1em; text-align: center; color: var(--gold); margin-bottom: 20px; }
 
-        .sidebar img {
-            width: 100%;
-            max-width: 300px;
-            border: 1px solid var(--gold);
-            border-radius: 4px;
-            margin-bottom: 20px;
+        /* Sidebar Buttons */
+        .sidebar-actions { width: 100%; display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+        .action-btn { 
+            background: transparent; border: 1px solid #332b00; color: #8a7b4a; padding: 8px; 
+            font-family: 'Cinzel Decorative', serif; cursor: pointer; font-size: 12px; transition: 0.3s;
         }
+        .action-btn:hover { color: var(--gold); border-color: var(--gold); background: rgba(212, 175, 55, 0.05); }
 
-        .sidebar h1 {
-            font-family: 'Cinzel Decorative', serif;
-            font-size: 1.2em;
-            text-align: center;
-            color: var(--pale-gold);
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-        }
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); flex: 1; display: flex; flex-direction: column; height: 100vh; background: radial-gradient(circle at top right, #1c1808 0%, var(--stone) 100%); }
+        #chat { flex: 1; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; }
 
-        .key-box {
-            margin-top: auto;
-            width: 100%;
-        }
+        /* Messages */
+        .msg { margin-bottom: 25px; padding: 22px; border-radius: 4px; max-width: 85%; line-height: 1.8; font-size: 19px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .marika { background: rgba(212, 175, 55, 0.08); border-left: 4px solid var(--gold); align-self: flex-start; }
+        .user { background: rgba(255, 255, 255, 0.05); border: 1px solid #332b00; align-self: flex-end; color: #fff; }
 
-        .key-box input {
-            width: 90%;
-            background: #111;
-            border: 1px solid #332b00;
-            color: var(--gold);
-            font-size: 12px;
-            padding: 8px;
-            opacity: 0.5;
-        }
+        /* Input Bar */
+        #input-bar { padding: 25px 40px; background: #050503; display: flex; gap: 15px; border-top: 1px solid var(--gold); }
+        input#user-input { flex: 1; padding: 18px; background: #111; border: 1px solid #332b00; color: #f3e5ab; font-size: 18px; outline: none; }
+        .invoke-btn { padding: 0 40px; background: var(--gold); color: #000; font-family: 'Cinzel Decorative', serif; font-weight: bold; cursor: pointer; border: none; }
+        .refresh-btn { background: #1a1a1a; color: var(--gold); border: 1px solid #332b00; padding: 0 20px; font-size: 24px; cursor: pointer; }
 
-        /* Main Chat Area */
-        .main-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: radial-gradient(circle at top right, #1c1808 0%, var(--stone) 100%);
-        }
-
-        #chat { 
-            flex: 1; 
-            overflow-y: auto; 
-            padding: 40px; 
-            display: flex; 
-            flex-direction: column; 
-        }
-
-        .msg { 
-            margin-bottom: 20px; 
-            padding: 20px 25px; 
-            border-radius: 4px; 
-            max-width: 85%; 
-            line-height: 1.8; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
-        }
-
-        .user { 
-            background: rgba(255, 255, 255, 0.03); 
-            align-self: flex-end; 
-            border: 1px solid #332b00; 
-            color: #fff; 
-        }
-
-        .marika { 
-            background: rgba(212, 175, 55, 0.07); 
-            border-left: 4px solid var(--gold); 
-            color: var(--pale-gold); 
-            align-self: flex-start;
-        }
-
-        /* Wide Input Area */
-        #input-bar { 
-            padding: 30px; 
-            background: var(--deep-stone); 
-            display: flex; 
-            gap: 15px; 
-            border-top: 1px solid var(--gold); 
-        }
-
-        input#user-input { 
-            flex: 1; 
-            padding: 18px; 
-            border: 1px solid #332b00; 
-            background: #111; 
-            color: var(--pale-gold); 
-            outline: none; 
-            font-size: 19px; 
-            font-family: 'Lora', serif;
-        }
-
-        .btn-group { display: flex; gap: 10px; }
-
-        button { 
-            padding: 0 30px; 
-            background: var(--gold); 
-            color: #000; 
-            border: none; 
-            cursor: pointer; 
-            font-family: 'Cinzel Decorative', serif; 
-            font-size: 16px; 
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-        button:hover { background: #fff; box-shadow: 0 0 15px var(--gold); }
-        
-        #refresh-btn { background: #1a1a1a; color: var(--gold); border: 1px solid #332b00; padding: 0 20px; font-size: 24px; }
-
-        #debug { font-size: 14px; color: #ff5555; background: #1a0000; padding: 5px; display: none; text-align: center; }
-
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--stone); }
-        ::-webkit-scrollbar-thumb { background: #332b00; border-radius: 4px; }
+        .key-box { margin-top: auto; width: 100%; }
+        .key-box input { width: 100%; background: #111; border: none; color: #555; font-size: 10px; padding: 8px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-<aside class="sidebar">
-    <img src="marika.jpg" alt="Queen Marika">
-    <h1>Queen Marika the Eternal</h1>
+<div class="sidebar">
+    <img src="marika.jpg" alt="Marika">
+    <h1>Queen Marika</h1>
+    <div class="sidebar-actions">
+        <button class="action-btn" onclick="clearChat()">Begin New Age (Clear)</button>
+    </div>
     <div class="key-box">
-        <input type="password" id="api-key" placeholder="Enter Groq Key...">
+        <input type="password" id="api-key" placeholder="Enter Groq API Key..." onchange="saveKey()">
     </div>
-</aside>
+</div>
 
-<main class="main-container">
-    <div id="debug"></div>
+<div class="main-content">
     <div id="chat">
-        <div class="msg marika">O, my Lord. My Consort. You have mended the Elden Ring and stood beside me in the heart of the Erdtree. Speak, for the world is ours to command.</div>
-    </div>
+        </div>
 
     <div id="input-bar">
-        <button id="refresh-btn" onclick="regenerate()">↻</button>
+        <button class="refresh-btn" onclick="regenerate()">↻</button>
         <input type="text" id="user-input" placeholder="Address your Queen..." onkeypress="if(event.key === 'Enter') speak()">
-        <button id="send-btn" onclick="speak()">Invoke</button>
+        <button class="invoke-btn" id="send-btn" onclick="speak()">Invoke</button>
     </div>
-</main>
+</div>
 
 <script>
-    let chatHistory = [
-        { role: "system", content: `You are Queen Marika the Eternal. 
-        CONTEXT: The user is your Consort.
-        BEHAVIOR:
-        1. 80% Dialogue, 20% Narration.
-        2. Keep narration brief and in parentheses.
-        3. Use high-level vocabulary fitting for a god.
-        4. Focus on deep roleplay and accurate Elden Ring lore.` }
-    ];
+    const SYSTEM_PROMPT = `You are Queen Marika the Eternal. CONTEXT: The user is your Consort. BEHAVIOR: 1. 80% Dialogue, 20% Narration. 2. Keep narration brief/in parentheses. 3. Use high-level vocabulary. 4. Focus on deep roleplay and accurate Elden Ring lore. You have mended the Ring together.`;
+
+    let chatHistory = [];
+
+    // Initialization: Load from local storage
+    window.onload = function() {
+        const savedHistory = localStorage.getItem('marika_chat_history');
+        const savedKey = localStorage.getItem('marika_api_key');
+        
+        if (savedKey) document.getElementById('api-key').value = savedKey;
+
+        if (savedHistory) {
+            chatHistory = JSON.parse(savedHistory);
+            renderChat();
+        } else {
+            resetToDefault();
+        }
+    };
+
+    function resetToDefault() {
+        chatHistory = [
+            { role: "system", content: SYSTEM_PROMPT },
+            { role: "assistant", content: "My Lord... My Consort. You have mended the Elden Ring and stood beside me in the heart of the Erdtree. Speak, for the world is ours to command." }
+        ];
+        saveAndRender();
+    }
+
+    function saveKey() {
+        localStorage.setItem('marika_api_key', document.getElementById('api-key').value.trim());
+    }
+
+    function saveAndRender() {
+        localStorage.setItem('marika_chat_history', JSON.stringify(chatHistory));
+        renderChat();
+    }
+
+    function renderChat() {
+        const container = document.getElementById('chat');
+        container.innerHTML = '';
+        chatHistory.forEach(msg => {
+            if (msg.role === 'system') return;
+            appendUI(msg.role === 'user' ? 'user' : 'marika', msg.content);
+        });
+    }
 
     async function speak(isRegenerate = false) {
         const key = document.getElementById('api-key').value.trim();
         const input = document.getElementById('user-input');
-        const debug = document.getElementById('debug');
         const btn = document.getElementById('send-btn');
-        const chatContainer = document.getElementById('chat');
         
         let text = input.value.trim();
 
         if (isRegenerate) {
             if (chatHistory.length < 3) return;
             chatHistory.pop(); 
-            chatContainer.removeChild(chatContainer.lastChild); 
             text = chatHistory[chatHistory.length - 1].content; 
         } else {
             if (!text || !key) return;
             chatHistory.push({ role: "user", content: text });
-            appendUI('user', text);
             input.value = '';
         }
 
-        debug.style.display = 'none';
+        saveAndRender();
         btn.disabled = true;
 
         try {
@@ -225,19 +148,22 @@
             const data = await response.json();
             if (data.error) throw new Error(data.error.message);
             
-            const reply = data.choices[0].message.content;
-            chatHistory.push({ role: "assistant", content: reply });
-            appendUI('marika', reply);
-            
+            chatHistory.push({ role: "assistant", content: data.choices[0].message.content });
+            saveAndRender();
         } catch (err) {
-            debug.innerText = "Error: " + err.message;
-            debug.style.display = 'block';
+            alert("The Golden Order is fractured: " + err.message);
         } finally {
             btn.disabled = false;
         }
     }
 
     function regenerate() { if (chatHistory.length > 2) speak(true); }
+
+    function clearChat() {
+        if(confirm("Shall we break the cycle and begin anew? This will wipe the current memory.")) {
+            resetToDefault();
+        }
+    }
 
     function appendUI(role, text) {
         const div = document.createElement('div');
