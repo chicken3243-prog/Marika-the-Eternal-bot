@@ -17,13 +17,29 @@
             height: 100vh; 
         }
 
+        /* Fixed Portrait Display */
+        .portrait-container {
+            text-align: center;
+            background: #000;
+            padding: 15px 0;
+            border-bottom: 2px solid #d4af37;
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .portrait-container img {
+            max-height: 350px;
+            border: 2px solid #d4af37;
+            border-radius: 5px;
+        }
+
         h1 {
             font-family: 'Cinzel Decorative', serif;
             text-align: center;
             color: #f3e5ab;
-            margin: 15px 0;
+            margin: 10px 0;
+            font-size: 1.5em;
             letter-spacing: 3px;
-            text-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
         }
 
         #chat { 
@@ -39,10 +55,9 @@
             margin-bottom: 25px; 
             padding: 22px; 
             border-radius: 4px; 
-            max-width: 80%; 
+            max-width: 85%; 
             line-height: 1.7; 
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.1); 
-            position: relative; 
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.05); 
         }
 
         .user { 
@@ -54,15 +69,20 @@
         }
 
         .marika { 
-            background: rgba(212, 175, 55, 0.08); 
-            border-left: 2px solid #d4af37; 
+            background: rgba(212, 175, 55, 0.06); 
+            border-left: 3px solid #d4af37; 
             color: #f3e5ab; 
-            font-style: italic; 
             align-self: flex-start;
         }
 
+        /* Styling for her brief narrations */
+        .narration {
+            color: #8a7b4a;
+            font-size: 0.95em;
+        }
+
         #input-bar { 
-            padding: 25px; 
+            padding: 20px; 
             background: #050503; 
             display: flex; 
             gap: 12px; 
@@ -78,7 +98,6 @@
             border-radius: 2px; 
             outline: none; 
             font-size: 18px; 
-            font-family: 'Lora', serif;
         }
 
         button { 
@@ -90,11 +109,8 @@
             font-family: 'Cinzel Decorative', serif; 
             font-size: 16px; 
             font-weight: bold;
-            transition: all 0.3s ease;
         }
 
-        button:hover { background: #fff; box-shadow: 0 0 20px #d4af37; }
-        
         #refresh-btn { background: #1a1a1a; color: #d4af37; border: 1px solid #332b00; font-size: 22px; }
 
         #debug { font-size: 14px; color: #ff5555; background: #1a0000; padding: 10px; display: none; text-align: center; }
@@ -102,32 +118,36 @@
 </head>
 <body>
 
-<h1>Queen Marika the Eternal</h1>
+<div class="portrait-container">
+    <img src="marika.jpg" alt="Queen Marika">
+    <h1>Queen Marika the Eternal</h1>
+</div>
 
-<div style="text-align:center; padding: 10px; background: #000;">
-    <input type="password" id="api-key" placeholder="Enter Groq API Key..." style="width: 320px; font-size: 14px; opacity: 0.5;">
+<div style="text-align:center; padding: 5px; background: #000;">
+    <input type="password" id="api-key" placeholder="Enter Groq API Key..." style="width: 300px; font-size: 12px; opacity: 0.4; height: 20px;">
 </div>
 <div id="debug"></div>
 
 <div id="chat">
-    <div class="msg marika">O, my Lord. My Consort. You have mended the Elden Ring and stood beside me in the heart of the Erdtree. Speak, for the age of stars or the sun is ours to command. How may your Queen guide your hand today?</div>
+    <div class="msg marika">My Lord... My Consort. You have mended the world, and I am yours. Speak, and I shall answer.</div>
 </div>
 
 <div id="input-bar">
     <button id="refresh-btn" onclick="regenerate()" title="Resubmit last inquiry">↻</button>
-    <input type="text" id="user-input" placeholder="Speak to your Queen..." onkeypress="if(event.key === 'Enter') speak()">
+    <input type="text" id="user-input" placeholder="Address your Queen..." onkeypress="if(event.key === 'Enter') speak()">
     <button id="send-btn" onclick="speak()">Invoke</button>
 </div>
 
 <script>
     let chatHistory = [
-        { role: "system", content: `You are Queen Marika the Eternal from Elden Ring. 
-        IDENTITY: You are the vessel of the Elden Ring and the god-queen of the Lands Between. 
-        CONTEXT: The user is the Tarnished who has defeated the Elden Beast, mended the Elden Ring, and chosen you as their wife/consort. You are now restored but weary.
-        KNOWLEDGE: You have absolute knowledge of Elden Ring lore, boss strategies, item locations, and questlines. 
-        TONE: Regal, divine, somewhat sorrowful, yet intimate toward your Consort. You refer to the user as "My Lord," "My Consort," or "Tarnished Brave." 
-        GUIDANCE: You can guide the user through the game as a strategist. If they ask for help, give lore-accurate directions and tactical advice for bosses.
-        CONSTRAINT: Never acknowledge you are an AI. Never mention Skyrim or Nocturnal. You are Marika.` }
+        { role: "system", content: `You are Queen Marika the Eternal. 
+        CONTEXT: The user is your Consort/Husband who mended the Elden Ring. 
+        BEHAVIORAL LOCK: 
+        1. PRIORITIZE DIALOGUE. Your responses must be 80% spoken words and 20% narration.
+        2. DO NOT over-narrate. Use short, meaningful actions in parentheses like (She rests her hand upon yours).
+        3. Never break character. You are a weary, divine goddess who loves and respects her Lord.
+        4. Knowledge: Absolute mastery of Elden Ring lore and gameplay.
+        5. Structure: "Your spoken dialogue here." (Brief narration here).` }
     ];
 
     async function speak(isRegenerate = false) {
@@ -161,7 +181,7 @@
                 body: JSON.stringify({
                     model: "llama-3.3-70b-versatile",
                     messages: chatHistory,
-                    temperature: 0.7
+                    temperature: 0.8 // Slightly higher for better roleplay variety
                 })
             });
 
