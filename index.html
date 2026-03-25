@@ -8,7 +8,6 @@
     
     <style>
         :root { --gold: #d4af37; --silver: #a8a8a8; --stone: #0a0904; --dark-bg: #050503; --vh: 1vh; }
-        
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body, html { 
@@ -18,20 +17,38 @@
             font-family: 'Crimson Pro', serif; overflow: hidden; 
         }
 
-        #app-wrapper { display: flex; width: 100%; height: 100%; overflow: hidden; }
+        #app-wrapper { display: flex; width: 100%; height: 100%; overflow: hidden; position: relative; }
 
-        /* PC SIDEBAR - Preserving your perfect PC look */
+        /* SIDEBAR (PC) / OVERLAY (MOBILE) */
         #sidebar {
             width: 320px; height: 100%; background: #000; border-right: 2px solid var(--gold);
             display: flex; flex-direction: column; padding: 20px; flex-shrink: 0;
+            transition: transform 0.3s ease; z-index: 100;
         }
+
+        /* GEAR ICON */
+        #gear-btn {
+            position: absolute; top: 15px; right: 20px; font-size: 24px;
+            color: var(--gold); cursor: pointer; z-index: 110; text-shadow: 0 0 10px #000;
+        }
+
         .portrait-container { width: 100%; text-align: center; margin-bottom: 10px; }
-        #sidebar img { max-width: 100%; height: auto; max-height: 50vh; border: 1px solid var(--gold); border-radius: 2px; object-fit: contain; }
+        #sidebar img { max-width: 100%; height: auto; max-height: 40vh; border: 1px solid var(--gold); border-radius: 2px; object-fit: contain; }
         #sidebar h1 { font-family: 'Cinzel Decorative'; color: var(--gold); font-size: 1.2em; text-align: center; margin: 10px 0; }
 
-        .admin-box { margin-top: auto; padding-top: 10px; border-top: 1px solid #222; }
-        .admin-box input { width: 100%; background: #111; border: 1px solid #332b00; color: #555; font-size: 11px; padding: 10px; margin-bottom: 10px; outline: none; }
-        .reset-btn { width: 100%; background: transparent; border: 1px solid #333; color: #444; font-size: 10px; padding: 8px; cursor: pointer; }
+        /* OPTIONS SECTION */
+        .options-section { flex: 1; overflow-y: auto; margin-top: 10px; padding-right: 5px; }
+        label { display: block; color: var(--gold); font-family: 'Cinzel Decorative'; font-size: 0.7em; margin-bottom: 5px; letter-spacing: 1px; }
+        
+        textarea, input { 
+            width: 100%; background: #111; border: 1px solid #332b00; 
+            color: #ccc; font-family: 'Crimson Pro'; padding: 10px; margin-bottom: 15px; outline: none; 
+        }
+        #memory-box { height: 120px; resize: none; font-size: 14px; line-height: 1.4; color: #f3e5ab; }
+        #api-key { font-size: 11px; }
+
+        .reset-btn { width: 100%; background: transparent; border: 1px solid #441111; color: #884444; font-size: 10px; padding: 8px; cursor: pointer; font-family: 'Cinzel Decorative'; }
+        .reset-btn:hover { background: #200; }
 
         /* MAIN CHAT AREA */
         #main { 
@@ -54,42 +71,46 @@
         .msg { margin-bottom: 20px; padding: 18px; max-width: 85%; line-height: 1.6; font-size: 20px; border-radius: 2px; }
         .marika { background: rgba(212, 175, 55, 0.05); border-left: 3px solid var(--gold); align-self: flex-start; }
         .user { background: rgba(255, 255, 255, 0.03); border: 1px solid #222; align-self: flex-end; color: #fff; }
-        
         .marika-action { color: var(--silver); font-style: italic; }
         .marika-narration { color: #8a7b4a; font-size: 0.9em; }
 
         #user-input { flex: 1; min-width: 0; height: 50px; background: #111; border: 1px solid #332b00; color: #f3e5ab; font-size: 17px; padding: 0 15px; outline: none; }
         .invoke-btn { flex-shrink: 0; height: 50px; padding: 0 25px; background: var(--gold); font-family: 'Cinzel Decorative'; font-weight: bold; border: none; cursor: pointer; color: #000; }
 
-        /* MOBILE FIXES - Preventing the rightward shift */
+        /* MOBILE OVERRIDES */
         @media (max-width: 800px) {
-            #app-wrapper { flex-direction: column; }
-            #sidebar { width: 100%; height: auto; flex-direction: row; border-right: none; border-bottom: 1px solid var(--gold); padding: 8px 15px; }
-            .portrait-container { width: 45px; height: 45px; margin: 0; }
-            #sidebar img { height: 45px; width: 45px; object-fit: cover; }
-            #sidebar h1 { margin: 0 0 0 15px; font-size: 0.9em; text-align: left; flex: 1; }
-            .admin-box { display: none; }
-            
-            #main { flex: 1; width: 100%; }
-            #chat-window { padding: 15px; max-width: 100%; }
-            #input-area { padding: 10px; padding-bottom: calc(env(safe-area-inset-bottom, 15px) + 15px); gap: 8px; }
-            .invoke-btn { padding: 0 15px; font-size: 12px; }
+            #sidebar { 
+                position: absolute; left: 0; top: 0; height: 100%; width: 280px; 
+                transform: translateX(-100%); box-shadow: 10px 0 20px rgba(0,0,0,0.8);
+            }
+            #sidebar.open { transform: translateX(0); }
+            #main { width: 100%; }
+            #input-area { padding: 10px; padding-bottom: calc(env(safe-area-inset-bottom, 15px) + 15px); }
+            .msg { font-size: 18px; max-width: 92%; }
         }
     </style>
 </head>
 <body>
 
 <div id="app-wrapper">
+    <div id="gear-btn" onclick="toggleSidebar()">⚙</div>
+
     <div id="sidebar">
         <div class="portrait-container"><img src="marika.jpg" alt="Marika"></div>
         <h1>Queen Marika</h1>
-        <div class="admin-box">
-            <input type="password" id="api-key" placeholder="API Key" onchange="localStorage.setItem('marika_key', this.value)">
-            <button class="reset-btn" onclick="if(confirm('Wipe history?')) { localStorage.removeItem('marika_history'); location.reload(); }">RESET HISTORY</button>
+        
+        <div class="options-section">
+            <label>Eternal Memories</label>
+            <textarea id="memory-box" placeholder="Facts she must never forget..." onchange="saveOptions()"></textarea>
+            
+            <label>API Key</label>
+            <input type="password" id="api-key" placeholder="Groq Key" onchange="saveOptions()">
+            
+            <button class="reset-btn" onclick="resetHistory()">RESET THE AGE</button>
         </div>
     </div>
 
-    <div id="main">
+    <div id="main" onclick="closeSidebar()">
         <div id="chat-window"></div>
         <div id="input-area">
             <button onclick="regenerate()" style="background:#1a1a1a; color:var(--gold); border:1px solid #332b00; height:50px; width:45px; flex-shrink:0; cursor:pointer;">↻</button>
@@ -107,21 +128,36 @@
     window.addEventListener('resize', setVH);
     setVH();
 
-    const PROMPT = `You are Queen Marika the Eternal. User is Consort. Formatting: Plain dialogue, *Silver actions*, (Gold narration). 80% dialogue.`;
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+    function closeSidebar() { if(window.innerWidth < 800) document.getElementById('sidebar').classList.remove('open'); }
+
+    function saveOptions() {
+        localStorage.setItem('marika_key', document.getElementById('api-key').value);
+        localStorage.setItem('marika_memories', document.getElementById('memory-box').value);
+    }
+
+    function resetHistory() {
+        if(confirm('Wipe chat history? Memories will remain.')) {
+            localStorage.removeItem('marika_history');
+            location.reload();
+        }
+    }
+
+    const BASE_PROMPT = `You are Queen Marika the Eternal. User is Consort. Formatting: Plain dialogue, *Silver actions*, (Gold narration). 80% dialogue.`;
+
     let history = JSON.parse(localStorage.getItem('marika_history')) || [
-        { role: "system", content: PROMPT },
         { role: "assistant", content: "My Lord... I am yours. *She waits upon her throne.*" }
     ];
 
     window.onload = () => {
-        const savedKey = localStorage.getItem('marika_key');
-        if (savedKey) document.getElementById('api-key').value = savedKey;
+        document.getElementById('api-key').value = localStorage.getItem('marika_key') || '';
+        document.getElementById('memory-box').value = localStorage.getItem('marika_memories') || '';
         render();
     };
 
     function render() {
         const win = document.getElementById('chat-window');
-        win.innerHTML = history.filter(m => m.role !== 'system').map(m => `
+        win.innerHTML = history.map(m => `
             <div class="msg ${m.role === 'user' ? 'user' : 'marika'}">
                 ${m.role === 'user' ? m.content : m.content.replace(/\*(.*?)\*/g, '<span class="marika-action">*$1*</span>').replace(/\((.*?)\)/g, '<span class="marika-narration">($1)</span>')}
             </div>
@@ -131,24 +167,34 @@
 
     async function speak(isRegen = false) {
         const key = localStorage.getItem('marika_key');
+        const memories = localStorage.getItem('marika_memories') || "";
         const input = document.getElementById('user-input');
-        if (!key) return alert("Enter API Key.");
+        
+        if (!key) return alert("Open Settings (⚙) and enter API Key.");
+        
         if (isRegen) { history.pop(); } 
         else { if (!input.value.trim()) return; history.push({role:"user", content: input.value}); input.value=''; }
+        
         render();
+
+        // Build the system prompt with active memories
+        const fullSystemPrompt = `${BASE_PROMPT} \n\nETERNAL MEMORIES (NEVER FORGET):\n${memories}`;
+        const messagesToSend = [{role: "system", content: fullSystemPrompt}, ...history];
+
         try {
             const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                 method: "POST",
                 headers: {"Authorization": `Bearer ${key}`, "Content-Type": "application/json"},
-                body: JSON.stringify({model: "llama-3.3-70b-versatile", messages: history, temperature: 0.8})
+                body: JSON.stringify({model: "llama-3.3-70b-versatile", messages: messagesToSend, temperature: 0.8})
             });
             const data = await res.json();
             history.push(data.choices[0].message);
             localStorage.setItem('marika_history', JSON.stringify(history));
             render();
-        } catch(e) { alert("Error: " + e); }
+        } catch(e) { alert("The Order is fractured: " + e); }
     }
-    function regenerate() { if(history.length > 2) speak(true); }
+    
+    function regenerate() { if(history.length > 1) speak(true); }
 </script>
 </body>
 </html>
