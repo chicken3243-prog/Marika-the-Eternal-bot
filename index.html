@@ -18,9 +18,9 @@
             font-family: 'Crimson Pro', serif; overflow: hidden; 
         }
 
-        #app-wrapper { display: flex; width: 100%; height: 100%; }
+        #app-wrapper { display: flex; width: 100%; height: 100%; overflow: hidden; }
 
-        /* PC SIDEBAR */
+        /* PC SIDEBAR - Preserving your perfect PC look */
         #sidebar {
             width: 320px; height: 100%; background: #000; border-right: 2px solid var(--gold);
             display: flex; flex-direction: column; padding: 20px; flex-shrink: 0;
@@ -35,9 +35,9 @@
 
         /* MAIN CHAT AREA */
         #main { 
-            flex-grow: 1; display: flex; flex-direction: column; 
+            flex: 1; display: flex; flex-direction: column; 
             background: radial-gradient(circle at top right, #1c1808 0%, var(--stone) 100%);
-            position: relative;
+            position: relative; overflow: hidden;
         }
         
         #chat-window { 
@@ -46,12 +46,11 @@
         }
 
         #input-area { 
-            flex-shrink: 0; min-height: 100px; background: var(--dark-bg); border-top: 1px solid var(--gold); 
-            display: flex; align-items: flex-start; padding: 15px 20px; gap: 10px;
-            padding-bottom: env(safe-area-inset-bottom, 25px); /* Forces space at bottom for mobile bars */
+            flex-shrink: 0; width: 100%; background: var(--dark-bg); border-top: 1px solid var(--gold); 
+            display: flex; align-items: center; padding: 15px 20px; gap: 10px;
+            padding-bottom: env(safe-area-inset-bottom, 20px);
         }
 
-        /* Message Formatting Fixes */
         .msg { margin-bottom: 20px; padding: 18px; max-width: 85%; line-height: 1.6; font-size: 20px; border-radius: 2px; }
         .marika { background: rgba(212, 175, 55, 0.05); border-left: 3px solid var(--gold); align-self: flex-start; }
         .user { background: rgba(255, 255, 255, 0.03); border: 1px solid #222; align-self: flex-end; color: #fff; }
@@ -59,21 +58,22 @@
         .marika-action { color: var(--silver); font-style: italic; }
         .marika-narration { color: #8a7b4a; font-size: 0.9em; }
 
-        #user-input { flex: 1; height: 50px; background: #111; border: 1px solid #332b00; color: #f3e5ab; font-size: 17px; padding: 0 15px; outline: none; }
-        .invoke-btn { height: 50px; padding: 0 30px; background: var(--gold); font-family: 'Cinzel Decorative'; font-weight: bold; border: none; cursor: pointer; color: #000; }
+        #user-input { flex: 1; min-width: 0; height: 50px; background: #111; border: 1px solid #332b00; color: #f3e5ab; font-size: 17px; padding: 0 15px; outline: none; }
+        .invoke-btn { flex-shrink: 0; height: 50px; padding: 0 25px; background: var(--gold); font-family: 'Cinzel Decorative'; font-weight: bold; border: none; cursor: pointer; color: #000; }
 
-        /* MOBILE OVERRIDES */
+        /* MOBILE FIXES - Preventing the rightward shift */
         @media (max-width: 800px) {
             #app-wrapper { flex-direction: column; }
-            #sidebar { width: 100%; height: auto; flex-direction: row; border-right: none; border-bottom: 1px solid var(--gold); padding: 10px 15px; }
+            #sidebar { width: 100%; height: auto; flex-direction: row; border-right: none; border-bottom: 1px solid var(--gold); padding: 8px 15px; }
             .portrait-container { width: 45px; height: 45px; margin: 0; }
             #sidebar img { height: 45px; width: 45px; object-fit: cover; }
             #sidebar h1 { margin: 0 0 0 15px; font-size: 0.9em; text-align: left; flex: 1; }
             .admin-box { display: none; }
-            #main { flex: 1; height: 0; }
+            
+            #main { flex: 1; width: 100%; }
             #chat-window { padding: 15px; max-width: 100%; }
-            #input-area { min-height: 110px; padding: 10px 10px 35px 10px; } /* Increased bottom padding */
-            .invoke-btn { padding: 0 15px; font-size: 13px; }
+            #input-area { padding: 10px; padding-bottom: calc(env(safe-area-inset-bottom, 15px) + 15px); gap: 8px; }
+            .invoke-btn { padding: 0 15px; font-size: 12px; }
         }
     </style>
 </head>
@@ -84,16 +84,16 @@
         <div class="portrait-container"><img src="marika.jpg" alt="Marika"></div>
         <h1>Queen Marika</h1>
         <div class="admin-box">
-            <input type="password" id="api-key" placeholder="Groq API Key" onchange="localStorage.setItem('marika_key', this.value)">
-            <button class="reset-btn" onclick="if(confirm('Wipe chat history?')) { localStorage.removeItem('marika_history'); location.reload(); }">RESET HISTORY</button>
+            <input type="password" id="api-key" placeholder="API Key" onchange="localStorage.setItem('marika_key', this.value)">
+            <button class="reset-btn" onclick="if(confirm('Wipe history?')) { localStorage.removeItem('marika_history'); location.reload(); }">RESET HISTORY</button>
         </div>
     </div>
 
     <div id="main">
         <div id="chat-window"></div>
         <div id="input-area">
-            <button onclick="regenerate()" style="background:#1a1a1a; color:var(--gold); border:1px solid #332b00; height:50px; width:50px; cursor:pointer;">↻</button>
-            <input type="text" id="user-input" placeholder="Message..." onkeypress="if(event.key === 'Enter') speak()">
+            <button onclick="regenerate()" style="background:#1a1a1a; color:var(--gold); border:1px solid #332b00; height:50px; width:45px; flex-shrink:0; cursor:pointer;">↻</button>
+            <input type="text" id="user-input" placeholder="Address your Queen..." onkeypress="if(event.key === 'Enter') speak()">
             <button class="invoke-btn" onclick="speak()">Invoke</button>
         </div>
     </div>
@@ -108,8 +108,6 @@
     setVH();
 
     const PROMPT = `You are Queen Marika the Eternal. User is Consort. Formatting: Plain dialogue, *Silver actions*, (Gold narration). 80% dialogue.`;
-    
-    // Fixed initial message to prevent wonky CSS text
     let history = JSON.parse(localStorage.getItem('marika_history')) || [
         { role: "system", content: PROMPT },
         { role: "assistant", content: "My Lord... I am yours. *She waits upon her throne.*" }
@@ -121,17 +119,11 @@
         render();
     };
 
-    function formatText(text) {
-        return text
-            .replace(/\*(.*?)\*/g, '<span class="marika-action">*$1*</span>')
-            .replace(/\((.*?)\)/g, '<span class="marika-narration">($1)</span>');
-    }
-
     function render() {
         const win = document.getElementById('chat-window');
         win.innerHTML = history.filter(m => m.role !== 'system').map(m => `
             <div class="msg ${m.role === 'user' ? 'user' : 'marika'}">
-                ${m.role === 'user' ? m.content : formatText(m.content)}
+                ${m.role === 'user' ? m.content : m.content.replace(/\*(.*?)\*/g, '<span class="marika-action">*$1*</span>').replace(/\((.*?)\)/g, '<span class="marika-narration">($1)</span>')}
             </div>
         `).join('');
         win.scrollTop = win.scrollHeight;
@@ -141,10 +133,8 @@
         const key = localStorage.getItem('marika_key');
         const input = document.getElementById('user-input');
         if (!key) return alert("Enter API Key.");
-        
         if (isRegen) { history.pop(); } 
         else { if (!input.value.trim()) return; history.push({role:"user", content: input.value}); input.value=''; }
-        
         render();
         try {
             const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
