@@ -19,14 +19,14 @@
 
         #app-wrapper { display: flex; width: 100%; height: 100%; overflow: hidden; position: relative; }
 
-        /* SIDEBAR - Now handles only the Portrait/Name */
+        /* PC SIDEBAR - DO NOT CHANGE */
         #sidebar {
             width: 320px; height: 100%; background: #000; border-right: 2px solid var(--gold);
             display: flex; flex-direction: column; padding: 20px; flex-shrink: 0;
             z-index: 10;
         }
 
-        /* OPTIONS OVERLAY - The hidden menu */
+        /* OPTIONS OVERLAY */
         #options-overlay {
             position: absolute; left: 320px; top: 0; height: 100%; width: 300px;
             background: rgba(0, 0, 0, 0.95); border-right: 1px solid var(--gold);
@@ -36,25 +36,19 @@
         }
         #options-overlay.open { transform: translateX(0); }
 
-        /* GEAR ICON */
         #gear-btn {
             position: absolute; top: 15px; left: 15px; font-size: 22px;
             color: var(--gold); cursor: pointer; z-index: 100; opacity: 0.6; transition: 0.3s;
         }
-        #gear-btn:hover { opacity: 1; transform: rotate(45deg); }
 
         .portrait-container { width: 100%; text-align: center; margin-top: 20px; }
         #sidebar img { max-width: 100%; height: auto; max-height: 55vh; border: 1px solid var(--gold); border-radius: 2px; object-fit: contain; }
         #sidebar h1 { font-family: 'Cinzel Decorative'; color: var(--gold); font-size: 1.2em; text-align: center; margin: 20px 0; letter-spacing: 2px; }
 
-        label { display: block; color: var(--gold); font-family: 'Cinzel Decorative'; font-size: 0.7em; margin-bottom: 8px; letter-spacing: 1px; }
-        textarea, input { 
-            width: 100%; background: #111; border: 1px solid #332b00; 
-            color: #ccc; font-family: 'Crimson Pro'; padding: 12px; margin-bottom: 20px; outline: none; 
-        }
-        #memory-box { height: 200px; resize: none; font-size: 14px; color: #f3e5ab; border-radius: 4px; }
-        
-        .reset-btn { margin-top: auto; width: 100%; background: transparent; border: 1px solid #441111; color: #884444; font-size: 10px; padding: 10px; cursor: pointer; font-family: 'Cinzel Decorative'; }
+        label { display: block; color: var(--gold); font-family: 'Cinzel Decorative'; font-size: 0.7em; margin-bottom: 8px; }
+        textarea, input { width: 100%; background: #111; border: 1px solid #332b00; color: #ccc; padding: 12px; margin-bottom: 20px; outline: none; }
+        #memory-box { height: 200px; resize: none; font-size: 14px; color: #f3e5ab; }
+        .reset-btn { margin-top: auto; width: 100%; background: transparent; border: 1px solid #441111; color: #884444; font-size: 10px; padding: 10px; cursor: pointer; }
 
         /* MAIN CHAT AREA */
         #main { 
@@ -83,15 +77,24 @@
         #user-input { flex: 1; min-width: 0; height: 50px; background: #111; border: 1px solid #332b00; color: #f3e5ab; font-size: 17px; padding: 0 15px; outline: none; }
         .invoke-btn { flex-shrink: 0; height: 50px; padding: 0 25px; background: var(--gold); font-family: 'Cinzel Decorative'; font-weight: bold; border: none; cursor: pointer; color: #000; }
 
-        /* MOBILE OVERRIDES */
+        /* MOBILE OVERRIDES - Targeted fix for the "Shifted" look */
         @media (max-width: 800px) {
-            #sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--gold); padding: 10px; }
-            .portrait-container { width: 45px; height: 45px; margin: 0; }
-            #sidebar img { height: 45px; width: 45px; object-fit: cover; }
-            #sidebar h1 { margin: 0 0 0 15px; font-size: 1em; text-align: left; flex: 1; }
-            #options-overlay { left: 0; width: 100%; z-index: 150; }
+            #app-wrapper { flex-direction: column; }
+            #sidebar { 
+                width: 100%; height: 70px; /* Fixed height for top bar */
+                flex-direction: row; border-right: none; border-bottom: 1px solid var(--gold); 
+                padding: 0 15px; align-items: center; justify-content: flex-start;
+            }
+            .portrait-container { width: 45px; height: 45px; margin: 0; flex-shrink: 0; }
+            #sidebar img { height: 45px; width: 45px; object-fit: cover; border-radius: 50%; }
+            #sidebar h1 { margin: 0 0 0 15px; font-size: 0.9em; text-align: left; flex: 1; border: none; }
+            
+            #options-overlay { left: 0; width: 100%; z-index: 150; transform: translateY(-100%); transform: translateX(0); display: none; }
+            #options-overlay.open { display: flex; transform: translateY(0); }
+            
             #gear-btn { left: auto; right: 15px; top: 22px; }
-            #input-area { padding-bottom: calc(env(safe-area-inset-bottom, 15px) + 15px); }
+            #chat-window { padding: 15px; }
+            #input-area { padding-bottom: calc(env(safe-area-inset-bottom, 10px) + 10px); }
         }
     </style>
 </head>
@@ -108,10 +111,8 @@
     <div id="options-overlay">
         <label>Eternal Memories</label>
         <textarea id="memory-box" placeholder="Facts she must never forget..." onchange="saveOptions()"></textarea>
-        
         <label>Groq API Key</label>
         <input type="password" id="api-key" placeholder="Paste Key Here" onchange="saveOptions()">
-        
         <button class="reset-btn" onclick="resetHistory()">RESET THE AGE</button>
         <button onclick="toggleOptions()" style="margin-top:15px; background:none; border:none; color:var(--gold); cursor:pointer; font-family:'Cinzel Decorative'; font-size:10px;">[ CLOSE ]</button>
     </div>
