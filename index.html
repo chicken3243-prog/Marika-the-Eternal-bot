@@ -2,97 +2,101 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>The Erdtree's Rest</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Erdtree's Rest</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;500&display=swap" rel="stylesheet">
     
     <style>
         :root { --gold: #d4af37; --silver: #a8a8a8; --stone: #0a0904; --sidebar-width: 320px; }
         
+        * { box-sizing: border-box; }
         body { 
-            background: var(--stone); 
-            color: #e0d7b8; 
-            font-family: 'Crimson Pro', serif; 
-            font-size: 20px; 
-            margin: 0; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: row;
-            overflow: hidden; 
+            background: var(--stone); color: #e0d7b8; font-family: 'Crimson Pro', serif; 
+            margin: 0; height: 100vh; display: flex; overflow: hidden; 
         }
 
-        /* Sidebar - Default Desktop */
+        /* Desktop Sidebar */
         .sidebar {
             width: var(--sidebar-width); height: 100vh; background: #000; border-right: 2px solid var(--gold);
-            display: flex; flex-direction: column; align-items: center; padding: 20px; box-sizing: border-box; flex-shrink: 0;
+            display: flex; flex-direction: column; align-items: center; padding: 20px; flex-shrink: 0;
         }
         .sidebar img { width: 100%; border: 1px solid var(--gold); border-radius: 4px; margin-bottom: 15px; }
-        .sidebar h1 { font-family: 'Cinzel Decorative', serif; font-size: 1.1em; text-align: center; color: var(--gold); margin-bottom: 15px; }
+        
+        /* Main Container */
+        .main-content { 
+            flex: 1; display: flex; flex-direction: column; height: 100vh; 
+            background: radial-gradient(circle at top right, #1c1808 0%, var(--stone) 100%); 
+            position: relative;
+        }
 
-        /* Main Content */
-        .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; background: radial-gradient(circle at top right, #1c1808 0%, var(--stone) 100%); min-width: 0; }
-        #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; }
+        /* CHAT AREA - This is the only part that scrolls */
+        #chat { 
+            flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column;
+            -webkit-overflow-scrolling: touch; /* Smooth scroll for iOS */
+        }
 
-        /* Messages */
-        .msg { margin-bottom: 20px; padding: 18px; border-radius: 2px; max-width: 90%; line-height: 1.5; box-shadow: 0 4px 15px rgba(0,0,0,0.4); white-space: pre-wrap; word-wrap: break-word; }
+        .msg { margin-bottom: 20px; padding: 18px; border-radius: 2px; max-width: 90%; line-height: 1.5; font-size: 19px; }
         .marika { background: rgba(212, 175, 55, 0.05); border-left: 3px solid var(--gold); align-self: flex-start; }
-        .user { background: rgba(255, 255, 255, 0.03); border: 1px solid #222; align-self: flex-end; color: #fff; font-family: 'Montserrat', sans-serif; font-size: 16px; }
+        .user { background: rgba(255, 255, 255, 0.03); border: 1px solid #222; align-self: flex-end; color: #fff; }
 
         .marika-action { color: var(--silver); font-style: italic; }
         .marika-narration { color: #8a7b4a; font-size: 0.9em; }
 
-        /* Input Bar */
-        #input-bar { padding: 15px; background: #050503; display: flex; gap: 10px; border-top: 1px solid var(--gold); }
-        input#user-input { flex: 1; padding: 12px; background: #111; border: 1px solid #332b00; color: #f3e5ab; font-size: 16px; outline: none; border-radius: 4px; }
-        .invoke-btn { padding: 0 20px; background: var(--gold); color: #000; font-family: 'Cinzel Decorative', serif; font-weight: bold; cursor: pointer; border: none; border-radius: 4px; }
-        .refresh-btn { background: #1a1a1a; color: var(--gold); border: 1px solid #332b00; padding: 0 15px; font-size: 20px; cursor: pointer; border-radius: 4px; }
+        /* INPUT BAR - Locked at the bottom */
+        #input-bar { 
+            padding: 15px; background: #050503; display: flex; gap: 10px; 
+            border-top: 1px solid var(--gold); flex-shrink: 0; z-index: 10;
+        }
+        input#user-input { 
+            flex: 1; padding: 12px; background: #111; border: 1px solid #332b00; 
+            color: #f3e5ab; font-size: 16px; outline: none; 
+        }
+        
+        .invoke-btn { padding: 0 20px; background: var(--gold); font-family: 'Cinzel Decorative'; font-weight: bold; border: none; cursor: pointer; }
 
-        .key-box { margin-top: auto; width: 100%; }
-        .key-box input { width: 100%; background: #111; border: none; color: #444; font-size: 10px; padding: 8px; box-sizing: border-box; }
-
-        /* MOBILE RESPONSIVE RULES */
+        /* Mobile Adjustments */
         @media (max-width: 768px) {
             body { flex-direction: column; }
             .sidebar { 
-                width: 100%; height: auto; border-right: none; border-bottom: 2px solid var(--gold); 
-                padding: 10px; flex-direction: row; gap: 15px; 
+                width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--gold); 
+                flex-direction: row; padding: 8px 15px; gap: 10px;
             }
-            .sidebar img { width: 60px; height: 60px; object-fit: cover; margin-bottom: 0; }
-            .sidebar h1 { font-size: 0.9em; margin-bottom: 0; flex: 1; text-align: left; }
-            .sidebar .action-btn { width: auto; font-size: 9px; padding: 5px; }
-            .main-content { margin-left: 0; }
-            #chat { padding: 15px; }
-            .msg { max-width: 95%; font-size: 18px; }
-            #input-bar { padding: 10px; }
+            .sidebar img { width: 45px; height: 45px; margin-bottom: 0; }
+            .sidebar h1 { font-size: 14px; flex: 1; margin: 0; }
+            .key-box { display: none; } /* Hide key on mobile to save space */
+            .msg { font-size: 17px; max-width: 95%; }
         }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <img src="marika.jpg" alt="Queen Marika">
-    <h1>Queen Marika</h1>
-    <button class="action-btn" style="width: auto; padding: 8px; background: transparent; border: 1px solid #332b00; color: #8a7b4a; font-family: 'Montserrat'; font-size: 10px;" onclick="clearChat()">RESET</button>
-    <div class="key-box" id="mobile-key-hide">
-        <input type="password" id="api-key" placeholder="Key" onchange="saveKey()">
+    <img src="marika.jpg" alt="Marika">
+    <h1 style="font-family: 'Cinzel Decorative'; color: var(--gold);">Queen Marika</h1>
+    <button onclick="clearChat()" style="background: none; border: 1px solid #332b00; color: #8a7b4a; font-size: 10px; padding: 5px;">RESET</button>
+    <div class="key-box">
+        <input type="password" id="api-key" placeholder="Key" onchange="saveKey()" style="width: 80px; font-size: 10px; background: #111; border: none; color: #444;">
     </div>
 </div>
 
 <div class="main-content">
     <div id="chat"></div>
     <div id="input-bar">
-        <button class="refresh-btn" onclick="regenerate()">↻</button>
-        <input type="text" id="user-input" placeholder="Speak..." onkeypress="if(event.key === 'Enter') speak()">
+        <button onclick="regenerate()" style="background: #1a1a1a; color: var(--gold); border: 1px solid #332b00; width: 45px;">↻</button>
+        <input type="text" id="user-input" placeholder="Message..." onkeypress="if(event.key === 'Enter') speak()">
         <button class="invoke-btn" id="send-btn" onclick="speak()">Invoke</button>
     </div>
 </div>
 
 <script>
-    // [The same JavaScript logic as before, just ensure the formatMarikaText function is included]
-    const SYSTEM_PROMPT = `You are Queen Marika the Eternal. User is Consort. Formatting: Plain dialogue, *Silver actions*, (Gold narration). Physical awareness: if mouth is full, no dialogue. 80% dialogue.`;
+    const SYSTEM_PROMPT = `You are Queen Marika the Eternal. User is Consort. 
+    Formatting: Plain text dialogue, *Silver actions*, (Gold narration). 
+    Constraint: If mouth is full/occupied, only actions and narration. 80% dialogue otherwise. Regal tone.`;
+
     let chatHistory = [];
 
     window.onload = function() {
-        const savedHistory = localStorage.getItem('marika_v5_history');
+        const savedHistory = localStorage.getItem('marika_v_final_history');
         const savedKey = localStorage.getItem('marika_api_key');
         if (savedKey) document.getElementById('api-key').value = savedKey;
         if (savedHistory) {
@@ -109,7 +113,10 @@
     }
 
     function saveKey() { localStorage.setItem('marika_api_key', document.getElementById('api-key').value.trim()); }
-    function saveAndRender() { localStorage.setItem('marika_v5_history', JSON.stringify(chatHistory)); renderChat(); }
+    function saveAndRender() { 
+        localStorage.setItem('marika_v_final_history', JSON.stringify(chatHistory)); 
+        renderChat(); 
+    }
 
     function formatMarikaText(text) {
         return text.replace(/\*(.*?)\*/g, '<span class="marika-action">*$1*</span>')
@@ -141,18 +148,4 @@
         try {
             const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                 method: "POST",
-                headers: { "Authorization": `Bearer ${key}`, "Content-Type": "application/json" },
-                body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: chatHistory, temperature: 0.85 })
-            });
-            const data = await response.json();
-            chatHistory.push({ role: "assistant", content: data.choices[0].message.content });
-            saveAndRender();
-        } catch (err) { alert("Error: " + err.message); }
-        finally { btn.disabled = false; }
-    }
-
-    function regenerate() { if (chatHistory.length > 2) speak(true); }
-    function clearChat() { if(confirm("Reset?")) resetToDefault(); }
-</script>
-</body>
-</html>
+                headers: { "Authorization": `Bearer
