@@ -2,99 +2,113 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>The Erdtree's Rest</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     
     <style>
-        :root { --gold: #d4af37; --silver: #a8a8a8; --stone: #0a0904; --dark-bg: #050503; }
+        :root { --gold: #d4af37; --silver: #a8a8a8; --stone: #0a0904; --dark-bg: #050503; --vh: 1vh; }
         
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         body, html { 
             margin: 0; padding: 0; 
-            height: 100vh; height: -webkit-fill-available;
+            height: 100vh; height: calc(var(--vh, 1vh) * 100);
             background: var(--stone); color: #e0d7b8; 
-            font-family: 'Crimson Pro', serif; overflow: hidden; display: flex; 
+            font-family: 'Crimson Pro', serif; overflow: hidden; 
+        }
+
+        #app-wrapper {
+            display: flex; width: 100%; height: 100%;
         }
 
         /* PC SIDEBAR */
         #sidebar {
-            width: 300px; height: 100%; background: #000; border-right: 2px solid var(--gold);
-            display: flex; flex-direction: column; padding: 15px; flex-shrink: 0;
+            width: 320px; height: 100%; background: #000; border-right: 2px solid var(--gold);
+            display: flex; flex-direction: column; padding: 20px; flex-shrink: 0;
         }
-        .portrait-container { width: 100%; display: flex; justify-content: center; }
-        #sidebar img { max-width: 100%; height: auto; max-height: 50vh; border: 1px solid var(--gold); border-radius: 2px; object-fit: contain; }
-        #sidebar h1 { font-family: 'Cinzel Decorative'; color: var(--gold); font-size: 1.1em; text-align: center; margin: 15px 0; }
+        .portrait-container { width: 100%; text-align: center; margin-bottom: 10px; }
+        #sidebar img { max-width: 100%; height: auto; max-height: 55vh; border: 1px solid var(--gold); border-radius: 2px; object-fit: contain; }
+        #sidebar h1 { font-family: 'Cinzel Decorative'; color: var(--gold); font-size: 1.2em; text-align: center; margin: 10px 0; }
 
         .admin-box { margin-top: auto; padding-top: 10px; border-top: 1px solid #222; }
-        .admin-box input { width: 100%; background: #111; border: 1px solid #332b00; color: #666; font-size: 11px; padding: 8px; margin-bottom: 8px; outline: none; }
-        .reset-btn { width: 100%; background: transparent; border: 1px solid #333; color: #444; font-size: 9px; padding: 5px; cursor: pointer; }
+        .admin-box input { width: 100%; background: #111; border: 1px solid #332b00; color: #555; font-size: 11px; padding: 10px; margin-bottom: 10px; outline: none; }
+        .reset-btn { width: 100%; background: transparent; border: 1px solid #333; color: #444; font-size: 10px; padding: 8px; cursor: pointer; }
 
-        /* MAIN AREA */
+        /* MAIN CHAT AREA */
         #main { 
-            flex-grow: 1; display: flex; flex-direction: column; height: 100%; 
-            background: radial-gradient(circle at top right, #1c1808 0%, var(--stone) 100%); 
+            flex-grow: 1; display: flex; flex-direction: column; 
+            background: radial-gradient(circle at top right, #1c1808 0%, var(--stone) 100%);
+            position: relative;
         }
         
-        /* Centering content on PC to remove "Dead Space" */
-        #chat-container {
-            flex: 1; display: flex; flex-direction: column;
-            max-width: 1100px; margin: 0 auto; width: 100%; overflow: hidden;
+        #chat-window { 
+            flex: 1; overflow-y: auto; padding: 25px; display: flex; flex-direction: column;
+            width: 100%; max-width: 900px; margin: 0 auto;
         }
 
-        #chat-window { flex: 1; overflow-y: auto; padding: 25px; display: flex; flex-direction: column; }
-
-        /* INPUT AREA */
         #input-area { 
-            height: 90px; background: var(--dark-bg); border-top: 1px solid var(--gold); 
-            display: flex; align-items: center; padding: 0 20px; gap: 10px; flex-shrink: 0;
+            flex-shrink: 0; height: 90px; background: var(--dark-bg); border-top: 1px solid var(--gold); 
+            display: flex; align-items: center; padding: 0 20px; gap: 10px;
         }
 
-        .msg { margin-bottom: 20px; padding: 18px; max-width: 90%; line-height: 1.6; font-size: 19px; border-radius: 2px; }
+        .msg { margin-bottom: 20px; padding: 18px; max-width: 85%; line-height: 1.6; font-size: 20px; border-radius: 2px; }
         .marika { background: rgba(212, 175, 55, 0.05); border-left: 3px solid var(--gold); align-self: flex-start; }
         .user { background: rgba(255, 255, 255, 0.03); border: 1px solid #222; align-self: flex-end; color: #fff; }
 
-        #user-input { flex: 1; height: 45px; background: #111; border: 1px solid #332b00; color: #f3e5ab; font-size: 16px; padding: 0 15px; outline: none; }
-        .invoke-btn { height: 45px; padding: 0 25px; background: var(--gold); font-family: 'Cinzel Decorative'; font-weight: bold; border: none; cursor: pointer; color: #000; }
+        #user-input { flex: 1; height: 50px; background: #111; border: 1px solid #332b00; color: #f3e5ab; font-size: 17px; padding: 0 15px; outline: none; }
+        .invoke-btn { height: 50px; padding: 0 30px; background: var(--gold); font-family: 'Cinzel Decorative'; font-weight: bold; border: none; cursor: pointer; }
 
-        /* MOBILE OVERRIDE */
+        /* MOBILE OVERRIDES */
         @media (max-width: 800px) {
-            body { flex-direction: column; }
-            #sidebar { width: 100%; height: auto; flex-direction: row; border-right: none; border-bottom: 1px solid var(--gold); padding: 8px 15px; align-items: center; }
-            .portrait-container { width: 50px; height: 50px; }
+            #app-wrapper { flex-direction: column; }
+            #sidebar { 
+                width: 100%; height: auto; flex-direction: row; border-right: none; 
+                border-bottom: 1px solid var(--gold); padding: 10px 15px; align-items: center; 
+            }
+            .portrait-container { width: 50px; height: 50px; margin: 0; }
             #sidebar img { height: 50px; width: 50px; object-fit: cover; }
-            #sidebar h1 { margin: 0 10px; font-size: 0.9em; text-align: left; flex: 1; }
+            #sidebar h1 { margin: 0 0 0 15px; font-size: 1em; text-align: left; flex: 1; }
             .admin-box { display: none; }
             
-            #main { flex: 1; height: 0; } /* Forces main to fill remaining space only */
-            #chat-window { padding: 15px; }
-            #input-area { height: 75px; padding: 10px; border-bottom: 10px solid var(--dark-bg); } /* Extra padding for mobile bars */
+            #main { flex: 1; height: 0; } /* Crucial: allows chat to scroll while input is pinned */
+            #chat-window { padding: 15px; max-width: 100%; }
+            #input-area { height: 80px; padding: 0 10px; }
+            .invoke-btn { padding: 0 15px; font-size: 14px; }
         }
     </style>
 </head>
 <body>
 
-<div id="sidebar">
-    <div class="portrait-container"><img src="marika.jpg" alt="Marika"></div>
-    <h1>Queen Marika</h1>
-    <div class="admin-box">
-        <input type="password" id="api-key" placeholder="API Key" onchange="localStorage.setItem('marika_key', this.value)">
-        <button class="reset-btn" onclick="if(confirm('Reset?')) { localStorage.removeItem('marika_history'); location.reload(); }">RESET HISTORY</button>
+<div id="app-wrapper">
+    <div id="sidebar">
+        <div class="portrait-container"><img src="marika.jpg" alt="Marika"></div>
+        <h1>Queen Marika</h1>
+        <div class="admin-box">
+            <input type="password" id="api-key" placeholder="Groq API Key" onchange="localStorage.setItem('marika_key', this.value)">
+            <button class="reset-btn" onclick="if(confirm('Wipe chat history?')) { localStorage.removeItem('marika_history'); location.reload(); }">RESET HISTORY</button>
+        </div>
     </div>
-</div>
 
-<div id="main">
-    <div id="chat-container">
+    <div id="main">
         <div id="chat-window"></div>
         <div id="input-area">
-            <button onclick="regenerate()" style="background:#1a1a1a; color:var(--gold); border:1px solid #332b00; height:45px; width:45px; cursor:pointer;">↻</button>
-            <input type="text" id="user-input" placeholder="Address your Queen..." onkeypress="if(event.key === 'Enter') speak()">
+            <button onclick="regenerate()" style="background:#1a1a1a; color:var(--gold); border:1px solid #332b00; height:50px; width:50px; cursor:pointer;">↻</button>
+            <input type="text" id="user-input" placeholder="Message..." onkeypress="if(event.key === 'Enter') speak()">
             <button class="invoke-btn" onclick="speak()">Invoke</button>
         </div>
     </div>
 </div>
 
 <script>
+    // MOBILE VIEWPORT HEIGHT HACK
+    function setVH() {
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
+    window.addEventListener('resize', setVH);
+    setVH();
+
     const PROMPT = `You are Queen Marika the Eternal. User is Consort. Formatting: Plain dialogue, *Silver actions*, (Gold narration). 80% dialogue.`;
     let history = JSON.parse(localStorage.getItem('marika_history')) || [
         { role: "system", content: PROMPT },
@@ -111,7 +125,7 @@
         const win = document.getElementById('chat-window');
         win.innerHTML = history.filter(m => m.role !== 'system').map(m => `
             <div class="msg ${m.role === 'user' ? 'user' : 'marika'}">
-                ${m.role === 'user' ? m.content : m.content.replace(/\*(.*?)\*/g, '<span class="marika-action">*$1*</span>').replace(/\((.*?)\)/g, '<span class="marika-narration">($1)</span>')}
+                ${m.role === 'user' ? m.content : m.content.replace(/\*(.*?)\*/g, '<span style="color:var(--silver); font-style:italic;">*$1*</span>').replace(/\((.*?)\)/g, '<span style="color:#8a7b4a; font-size:0.9em;">($1)</span>')}
             </div>
         `).join('');
         win.scrollTop = win.scrollHeight;
