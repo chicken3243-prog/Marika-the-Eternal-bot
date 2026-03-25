@@ -7,58 +7,59 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;500&display=swap" rel="stylesheet">
     
     <style>
-        :root { --gold: #d4af37; --silver: #a8a8a8; --stone: #0a0904; }
+        :root { --gold: #d4af37; --silver: #a8a8a8; --stone: #0a0904; --dark-bg: #050503; }
         
-        body, html { 
-            margin: 0; padding: 0; height: 100%; 
-            background: var(--stone); color: #e0d7b8; 
-            font-family: 'Crimson Pro', serif; overflow: hidden;
-        }
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--stone); color: #e0d7b8; font-family: 'Crimson Pro', serif; overflow: hidden; }
 
-        /* SIDEBAR - Fixed on Desktop */
+        /* SIDEBAR */
         #sidebar {
-            position: absolute; left: 0; top: 0; bottom: 0;
-            width: 300px; background: #000; border-right: 2px solid var(--gold);
-            padding: 20px; display: flex; flex-direction: column; align-items: center;
+            position: absolute; left: 0; top: 0; bottom: 0; width: 300px; 
+            background: #000; border-right: 2px solid var(--gold);
+            display: flex; flex-direction: column; padding: 15px; z-index: 10;
         }
-        #sidebar img { width: 100%; border: 1px solid var(--gold); border-radius: 4px; }
-        #sidebar h1 { font-family: 'Cinzel Decorative'; color: var(--gold); font-size: 1.1em; text-align: center; }
+        #sidebar img { width: 100%; border: 1px solid var(--gold); border-radius: 2px; }
+        #sidebar h1 { font-family: 'Cinzel Decorative'; color: var(--gold); font-size: 1.1em; text-align: center; margin: 15px 0; }
 
-        /* MAIN CHAT AREA */
-        #main {
-            position: absolute; left: 300px; right: 0; top: 0; bottom: 0;
-            display: flex; flex-direction: column;
-            background: radial-gradient(circle at top right, #1c1808 0%, var(--stone) 100%);
+        /* The Admin Box (API & Reset) */
+        .admin-box { margin-top: auto; padding-top: 15px; border-top: 1px solid #222; width: 100%; }
+        .admin-box input { 
+            width: 100%; background: #111; border: 1px solid #332b00; color: #555; 
+            font-size: 11px; padding: 8px; margin-bottom: 8px; outline: none;
         }
-
-        #chat-window {
-            flex: 1; overflow-y: auto; padding: 30px;
-            display: flex; flex-direction: column;
+        .admin-box input:focus { color: var(--gold); border-color: var(--gold); }
+        .reset-btn { 
+            width: 100%; background: transparent; border: 1px solid #444; color: #444; 
+            font-size: 10px; padding: 5px; cursor: pointer; font-family: 'Montserrat';
         }
+        .reset-btn:hover { color: #844; border-color: #844; }
 
-        #input-area {
-            height: 100px; background: #050503; border-top: 1px solid var(--gold);
-            display: flex; align-items: center; padding: 0 20px; gap: 10px;
-        }
+        /* CHAT AREA */
+        #main { position: absolute; left: 300px; right: 0; top: 0; bottom: 0; display: flex; flex-direction: column; }
+        #chat-window { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; }
+        #input-area { height: 80px; background: var(--dark-bg); border-top: 1px solid var(--gold); display: flex; align-items: center; padding: 0 20px; gap: 10px; }
 
-        /* Elements */
-        .msg { margin-bottom: 20px; padding: 20px; max-width: 85%; line-height: 1.6; font-size: 20px; }
+        /* Bubble Styles */
+        .msg { margin-bottom: 20px; padding: 18px; max-width: 85%; line-height: 1.6; font-size: 19px; border-radius: 2px; }
         .marika { background: rgba(212, 175, 55, 0.05); border-left: 3px solid var(--gold); align-self: flex-start; }
         .user { background: rgba(255, 255, 255, 0.03); border: 1px solid #222; align-self: flex-end; color: #fff; }
         
         .marika-action { color: var(--silver); font-style: italic; }
         .marika-narration { color: #8a7b4a; font-size: 0.9em; }
 
-        input { flex: 1; height: 50px; background: #111; border: 1px solid #332b00; color: #f3e5ab; font-size: 18px; padding: 0 15px; }
-        button { height: 50px; padding: 0 25px; background: var(--gold); font-family: 'Cinzel Decorative'; font-weight: bold; border: none; cursor: pointer; }
+        /* Controls */
+        #user-input { flex: 1; height: 45px; background: #111; border: 1px solid #332b00; color: #f3e5ab; font-size: 17px; padding: 0 15px; outline: none; }
+        .invoke-btn { height: 45px; padding: 0 30px; background: var(--gold); font-family: 'Cinzel Decorative'; font-weight: bold; border: none; cursor: pointer; transition: 0.3s; }
+        .invoke-btn:hover { background: #fff; box-shadow: 0 0 15px var(--gold); }
+        .regen-btn { height: 45px; width: 45px; background: #1a1a1a; color: var(--gold); border: 1px solid #332b00; cursor: pointer; }
 
-        /* MOBILE OVERRIDE */
+        /* Responsive Mobile */
         @media (max-width: 800px) {
-            #sidebar { position: relative; width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--gold); flex-direction: row; height: 80px; padding: 10px; }
-            #sidebar img { width: 50px; height: 50px; margin: 0; }
-            #sidebar h1 { font-size: 0.9em; margin-left: 10px; }
-            #main { position: relative; left: 0; height: calc(100% - 80px); }
-            .msg { font-size: 18px; max-width: 95%; }
+            #sidebar { width: 100%; height: 70px; flex-direction: row; position: relative; padding: 5px 15px; border-right: none; border-bottom: 1px solid var(--gold); }
+            #sidebar img { width: 50px; height: 50px; }
+            #sidebar h1 { margin: 0 0 0 10px; font-size: 0.9em; flex: 1; text-align: left; }
+            .admin-box { display: none; } /* Hide admin on mobile to keep it clean */
+            #main { left: 0; position: relative; height: calc(100% - 70px); }
+            .msg { font-size: 17px; max-width: 95%; }
         }
     </style>
 </head>
@@ -67,28 +68,31 @@
 <div id="sidebar">
     <img src="marika.jpg" alt="Marika">
     <h1>Queen Marika</h1>
-    <button onclick="localStorage.removeItem('marika_v6'); location.reload();" style="background:none; color:#444; font-size:10px; border:none; margin-top:10px;">RESET AGE</button>
-    <input type="password" id="api-key" placeholder="Key" onchange="localStorage.setItem('marika_key', this.value)" style="width:100%; height:30px; font-size:10px; margin-top:auto;">
+    <div class="admin-box">
+        <input type="password" id="api-key" placeholder="Enter API Key..." onchange="localStorage.setItem('marika_key', this.value)">
+        <button class="reset-btn" onclick="if(confirm('Reset the Age?')) { localStorage.removeItem('marika_history'); location.reload(); }">RESET HISTORY</button>
+    </div>
 </div>
 
 <div id="main">
     <div id="chat-window"></div>
     <div id="input-area">
-        <button onclick="regenerate()" style="background:#1a1a1a; color:var(--gold); border:1px solid #332b00; width:50px; padding:0;">↻</button>
-        <input type="text" id="user-input" placeholder="Message..." onkeypress="if(event.key === 'Enter') speak()">
-        <button onclick="speak()">Invoke</button>
+        <button class="regen-btn" onclick="regenerate()">↻</button>
+        <input type="text" id="user-input" placeholder="Address your Queen..." onkeypress="if(event.key === 'Enter') speak()">
+        <button class="invoke-btn" onclick="speak()">Invoke</button>
     </div>
 </div>
 
 <script>
     const PROMPT = `You are Queen Marika the Eternal. User is Consort. Formatting: Plain dialogue, *Silver actions*, (Gold narration). Constraint: If mouth is full, no dialogue. 80% dialogue.`;
-    let history = JSON.parse(localStorage.getItem('marika_v6')) || [
+    let history = JSON.parse(localStorage.getItem('marika_history')) || [
         { role: "system", content: PROMPT },
-        { role: "assistant", content: "My Lord... I am yours. *She waits upon her throne.*" }
+        { role: "assistant", content: "My Lord... I am yours. *She waits upon her throne, the golden light of the Erdtree dimming behind her.*" }
     ];
 
     window.onload = () => {
-        document.getElementById('api-key').value = localStorage.getItem('marika_key') || '';
+        const savedKey = localStorage.getItem('marika_key');
+        if (savedKey) document.getElementById('api-key').value = savedKey;
         render();
     };
 
@@ -105,21 +109,23 @@
     async function speak(isRegen = false) {
         const key = localStorage.getItem('marika_key');
         const input = document.getElementById('user-input');
-        if (!key) return alert("Enter API Key");
+        if (!key) return alert("Please enter your API key in the sidebar.");
         
         if (isRegen) { history.pop(); } 
         else { if (!input.value.trim()) return; history.push({role:"user", content: input.value}); input.value=''; }
         
         render();
-        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-            method: "POST",
-            headers: {"Authorization": `Bearer ${key}`, "Content-Type": "application/json"},
-            body: JSON.stringify({model: "llama-3.3-70b-versatile", messages: history, temperature: 0.8})
-        });
-        const data = await res.json();
-        history.push(data.choices[0].message);
-        localStorage.setItem('marika_v6', JSON.stringify(history));
-        render();
+        try {
+            const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                method: "POST",
+                headers: {"Authorization": `Bearer ${key}`, "Content-Type": "application/json"},
+                body: JSON.stringify({model: "llama-3.3-70b-versatile", messages: history, temperature: 0.8})
+            });
+            const data = await res.json();
+            history.push(data.choices[0].message);
+            localStorage.setItem('marika_history', JSON.stringify(history));
+            render();
+        } catch(e) { alert("The Golden Order is fractured: " + e); }
     }
 
     function regenerate() { if(history.length > 2) speak(true); }
