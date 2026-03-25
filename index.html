@@ -18,9 +18,7 @@
             font-family: 'Crimson Pro', serif; overflow: hidden; 
         }
 
-        #app-wrapper {
-            display: flex; width: 100%; height: 100%;
-        }
+        #app-wrapper { display: flex; width: 100%; height: 100%; }
 
         /* PC SIDEBAR */
         #sidebar {
@@ -28,7 +26,7 @@
             display: flex; flex-direction: column; padding: 20px; flex-shrink: 0;
         }
         .portrait-container { width: 100%; text-align: center; margin-bottom: 10px; }
-        #sidebar img { max-width: 100%; height: auto; max-height: 55vh; border: 1px solid var(--gold); border-radius: 2px; object-fit: contain; }
+        #sidebar img { max-width: 100%; height: auto; max-height: 50vh; border: 1px solid var(--gold); border-radius: 2px; object-fit: contain; }
         #sidebar h1 { font-family: 'Cinzel Decorative'; color: var(--gold); font-size: 1.2em; text-align: center; margin: 10px 0; }
 
         .admin-box { margin-top: auto; padding-top: 10px; border-top: 1px solid #222; }
@@ -48,33 +46,34 @@
         }
 
         #input-area { 
-            flex-shrink: 0; height: 90px; background: var(--dark-bg); border-top: 1px solid var(--gold); 
-            display: flex; align-items: center; padding: 0 20px; gap: 10px;
+            flex-shrink: 0; min-height: 100px; background: var(--dark-bg); border-top: 1px solid var(--gold); 
+            display: flex; align-items: flex-start; padding: 15px 20px; gap: 10px;
+            padding-bottom: env(safe-area-inset-bottom, 25px); /* Forces space at bottom for mobile bars */
         }
 
+        /* Message Formatting Fixes */
         .msg { margin-bottom: 20px; padding: 18px; max-width: 85%; line-height: 1.6; font-size: 20px; border-radius: 2px; }
         .marika { background: rgba(212, 175, 55, 0.05); border-left: 3px solid var(--gold); align-self: flex-start; }
         .user { background: rgba(255, 255, 255, 0.03); border: 1px solid #222; align-self: flex-end; color: #fff; }
+        
+        .marika-action { color: var(--silver); font-style: italic; }
+        .marika-narration { color: #8a7b4a; font-size: 0.9em; }
 
         #user-input { flex: 1; height: 50px; background: #111; border: 1px solid #332b00; color: #f3e5ab; font-size: 17px; padding: 0 15px; outline: none; }
-        .invoke-btn { height: 50px; padding: 0 30px; background: var(--gold); font-family: 'Cinzel Decorative'; font-weight: bold; border: none; cursor: pointer; }
+        .invoke-btn { height: 50px; padding: 0 30px; background: var(--gold); font-family: 'Cinzel Decorative'; font-weight: bold; border: none; cursor: pointer; color: #000; }
 
         /* MOBILE OVERRIDES */
         @media (max-width: 800px) {
             #app-wrapper { flex-direction: column; }
-            #sidebar { 
-                width: 100%; height: auto; flex-direction: row; border-right: none; 
-                border-bottom: 1px solid var(--gold); padding: 10px 15px; align-items: center; 
-            }
-            .portrait-container { width: 50px; height: 50px; margin: 0; }
-            #sidebar img { height: 50px; width: 50px; object-fit: cover; }
-            #sidebar h1 { margin: 0 0 0 15px; font-size: 1em; text-align: left; flex: 1; }
+            #sidebar { width: 100%; height: auto; flex-direction: row; border-right: none; border-bottom: 1px solid var(--gold); padding: 10px 15px; }
+            .portrait-container { width: 45px; height: 45px; margin: 0; }
+            #sidebar img { height: 45px; width: 45px; object-fit: cover; }
+            #sidebar h1 { margin: 0 0 0 15px; font-size: 0.9em; text-align: left; flex: 1; }
             .admin-box { display: none; }
-            
-            #main { flex: 1; height: 0; } /* Crucial: allows chat to scroll while input is pinned */
+            #main { flex: 1; height: 0; }
             #chat-window { padding: 15px; max-width: 100%; }
-            #input-area { height: 80px; padding: 0 10px; }
-            .invoke-btn { padding: 0 15px; font-size: 14px; }
+            #input-area { min-height: 110px; padding: 10px 10px 35px 10px; } /* Increased bottom padding */
+            .invoke-btn { padding: 0 15px; font-size: 13px; }
         }
     </style>
 </head>
@@ -101,7 +100,6 @@
 </div>
 
 <script>
-    // MOBILE VIEWPORT HEIGHT HACK
     function setVH() {
         let vh = window.innerHeight * 0.01;
         document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -110,6 +108,8 @@
     setVH();
 
     const PROMPT = `You are Queen Marika the Eternal. User is Consort. Formatting: Plain dialogue, *Silver actions*, (Gold narration). 80% dialogue.`;
+    
+    // Fixed initial message to prevent wonky CSS text
     let history = JSON.parse(localStorage.getItem('marika_history')) || [
         { role: "system", content: PROMPT },
         { role: "assistant", content: "My Lord... I am yours. *She waits upon her throne.*" }
@@ -121,11 +121,17 @@
         render();
     };
 
+    function formatText(text) {
+        return text
+            .replace(/\*(.*?)\*/g, '<span class="marika-action">*$1*</span>')
+            .replace(/\((.*?)\)/g, '<span class="marika-narration">($1)</span>');
+    }
+
     function render() {
         const win = document.getElementById('chat-window');
         win.innerHTML = history.filter(m => m.role !== 'system').map(m => `
             <div class="msg ${m.role === 'user' ? 'user' : 'marika'}">
-                ${m.role === 'user' ? m.content : m.content.replace(/\*(.*?)\*/g, '<span style="color:var(--silver); font-style:italic;">*$1*</span>').replace(/\((.*?)\)/g, '<span style="color:#8a7b4a; font-size:0.9em;">($1)</span>')}
+                ${m.role === 'user' ? m.content : formatText(m.content)}
             </div>
         `).join('');
         win.scrollTop = win.scrollHeight;
@@ -135,8 +141,10 @@
         const key = localStorage.getItem('marika_key');
         const input = document.getElementById('user-input');
         if (!key) return alert("Enter API Key.");
+        
         if (isRegen) { history.pop(); } 
         else { if (!input.value.trim()) return; history.push({role:"user", content: input.value}); input.value=''; }
+        
         render();
         try {
             const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
